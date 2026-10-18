@@ -13,7 +13,7 @@ server:
     threads:
       # tomcat最大线程数，默认为200
       max: 800
-      # Tomcat启动初始化的线程数，默认值10
+      # Tom9cat启动初始化的线程数，默认值10
       min-spare: 100
 
 # 日志配置
@@ -21,6 +21,7 @@ logging:
   level:
     com.xhzb: debug
     org.springframework: warn
+    org.springframeword.ai: debug
 
 # Spring配置
 spring:
@@ -42,20 +43,20 @@ spring:
       enabled: true
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.100.168:3306/xhzb?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://127.0.0.1:3306/xhzb?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
-    password: heima123
+    password: '0314'
   # redis 配置
   data:
     redis:
       # 地址
-      host: 192.168.100.168
+      host: 127.0.0.1
       # 端口，默认为6379
       port: 6379
       # 数据库索引
       database: 0
       # 密码
-      password: 123456
+      password:
       # 连接超时时间
       timeout: 10s
       jedis:
@@ -79,4 +80,4 @@ oss:
   endpoint: oss-cn-beijing.aliyuncs.com
   accessKeyId: ${OSS_ACCESS_KEY_ID}
   accessKeySecret: ${OSS_ACCESS_KEY_SECRET}
-  bucketName: itcastwu
+  bucketName: itheima-java1
