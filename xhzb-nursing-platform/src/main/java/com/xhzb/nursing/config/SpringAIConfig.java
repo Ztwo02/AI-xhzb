@@ -7,8 +7,12 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.JedisPooled;
 
 @Configuration
 public class SpringAIConfig {
@@ -29,6 +33,16 @@ public class SpringAIConfig {
                 .defaultTools(nursingProjectTool) //定义Tool Calling
                 .defaultSystem(SystemConstants.prompt) //定义System prompt
                 .defaultAdvisors(new SimpleLoggerAdvisor(), MessageChatMemoryAdvisor.builder(chatMemory).build()) //定义Advisor Log、MessageChatMemory
+                .build();
+    }
+
+    @Bean
+    public VectorStore redisVectorStore(OpenAiEmbeddingModel openAiEmbeddingModel) {
+        JedisPooled jedisPooled = new JedisPooled("192.168.111.128",6378);
+        return RedisVectorStore.builder(jedisPooled, openAiEmbeddingModel)
+                .indexName("spring-ai-index") //向量索引名
+                .prefix("doc:") //向量索引名称
+                .initializeSchema(true) //应用启动自动创建索引，首次启动true，生产关闭自动创建索引false
                 .build();
     }
 }
