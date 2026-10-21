@@ -5,9 +5,11 @@ import com.xhzb.nursing.tool.NursingProjectTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.context.annotation.Bean;
@@ -27,12 +29,19 @@ public class SpringAIConfig {
      */
 
     @Bean
-    public ChatClient chatClient(OpenAiChatModel openAiChatModel, NursingProjectTool nursingProjectTool, ChatMemory chatMemory) {
+    public ChatClient chatClient(OpenAiChatModel openAiChatModel, NursingProjectTool nursingProjectTool, ChatMemory chatMemory, VectorStore vectorStore) {
         return ChatClient
                 .builder(openAiChatModel) //创建LLM-model
                 .defaultTools(nursingProjectTool) //定义Tool Calling
                 .defaultSystem(SystemConstants.prompt) //定义System prompt
-                .defaultAdvisors(new SimpleLoggerAdvisor(), MessageChatMemoryAdvisor.builder(chatMemory).build()) //定义Advisor Log、MessageChatMemory
+                .defaultAdvisors(new SimpleLoggerAdvisor(), MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        QuestionAnswerAdvisor.builder(vectorStore)
+                                .searchRequest(SearchRequest.builder()
+                                        .similarityThreshold(0.7)
+                                        .topK(3)
+                                        .build())
+                                .build()
+                ) //定义Advisor Log、MessageChatMemory
                 .build();
     }
 
